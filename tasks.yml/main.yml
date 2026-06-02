@@ -38,3 +38,15 @@
     name: docker
     state: started
     enabled: true
+
+- name: Ensure docker group exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Add specified user to docker group
+  ansible.builtin.user:
+    name: "{{ docker_user | default(omit) }}"
+    groups: docker
+    append: true
+  when: docker_user is defined
