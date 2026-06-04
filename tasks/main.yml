@@ -4,7 +4,7 @@
     update_cache: true
   changed_when: false
 
-- name: Install required packages for Docker
+- name: Installeer vereiste packages voor Docker
   ansible.builtin.apt:
     name:
       - ca-certificates
@@ -14,7 +14,7 @@
     state: present
   notify: Restart docker
 
-- name: Add Docker official GPG key
+- name: Docker official GPG key toevoegen
   ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
@@ -28,7 +28,7 @@
   notify: Restart docker
 
 # geen docker dompose default
-- name: Install Docker Engine and plugins
+- name: Installeer Docker Engine and plugins
   ansible.builtin.apt:
     name:
       - docker-ce
@@ -41,7 +41,7 @@
   notify: Restart Docker
 
 # docker compose als daarom gevraagd wordt
-- name: Install Docker Compose (standalone) if requested
+- name: Installeer Docker Compose (standalone) als gevraagd
   ansible.builtin.apt:
     name: docker-compose
     state: present
@@ -54,13 +54,13 @@
     state: started
     enabled: true
 
-- name: Ensure docker group exists
+- name: Docker group check
   ansible.builtin.group:
     name: docker
     state: present
 
 # gebruiker toevoegen (rechten)
-- name: Add specified user to docker group
+- name: User aan docker group toevoegen
   ansible.builtin.user:
     name: "{{ docker_user }}"
     groups: docker
