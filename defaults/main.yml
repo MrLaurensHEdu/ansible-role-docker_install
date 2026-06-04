@@ -1,0 +1,9 @@
+---
+#custom user als dat nodig is
+docker_user: "{{ ansible_user | default(omit) }}"
+
+# Docker compose optie
+install_docker_compose: true
+
+# Eventuele extra's
+docker_extra_packages: []

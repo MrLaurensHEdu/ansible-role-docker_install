@@ -2,6 +2,7 @@
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: true
+  changed_when: false
 
 - name: Install required packages for Docker
   ansible.builtin.apt:
@@ -11,19 +12,23 @@
       - gnupg
       - lsb-release
     state: present
+  notify: Restart docker
 
 - name: Add Docker official GPG key
   ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+  notify: Restart docker
 
 - name: Add Docker repository
   ansible.builtin.apt_repository:
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
     update_cache: true
+  notify: Restart docker
 
-- name: Install Docker
+# geen docker dompose default
+- name: Install Docker Engine and plugins
   ansible.builtin.apt:
     name:
       - docker-ce
@@ -31,8 +36,17 @@
       - containerd.io
       - docker-buildx-plugin
       - docker-compose-plugin
-      - docker-compose
     state: present
+    update_cache: true
+  notify: Restart Docker
+
+# docker compose als daarom gevraagd wordt
+- name: Install Docker Compose (standalone) if requested
+  ansible.builtin.apt:
+    name: docker-compose
+    state: present
+  when: install_docker_compose | bool
+  notify: Restart Docker
 
 - name: Start and enable Docker service
   ansible.builtin.service:
@@ -45,9 +59,11 @@
     name: docker
     state: present
 
+# gebruiker toevoegen (rechten)
 - name: Add specified user to docker group
   ansible.builtin.user:
-    name: "{{ docker_user | default(omit) }}"
+    name: "{{ docker_user }}"
     groups: docker
     append: true
-  when: docker_user is defined
+  when: docker_user is defined and docker_user != omit
+  notify: Restart Docker
