@@ -1,5 +1,5 @@
 ---
-#custom user als dat nodig is
+# custom user als dat nodig is
 docker_user: "{{ ansible_user | default(omit) }}"
 
 # Docker compose optie
